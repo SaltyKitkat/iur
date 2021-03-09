@@ -3,3 +3,8 @@ intel-undervolt.service
 intel-undervolt-loop.service
 Makefile
 *.o
+
+
+# Added by cargo
+
+/target
