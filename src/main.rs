@@ -24,9 +24,15 @@ fn main() {
     let app_m = App::new("intel-undervolt-rs")
         .subcommands(vec![
             SubCommand::with_name("read"),
-            SubCommand::with_name("apply")
-                .args(&[Arg::with_name("dry-run").long("dry-run").short("n")]),
-            SubCommand::with_name("measure"),
+            SubCommand::with_name("apply").args(&[Arg::with_name("dry-run")
+                .long("dry-run")
+                .short("n")
+                .help("perform a trial run with no changes made")]),
+            SubCommand::with_name("measure").args(&[Arg::with_name("delay-time")
+                .long("delay-time")
+                .short("d")
+                .takes_value(true)
+                .help("Specifies  the  delay between screen updates")]),
         ])
         .get_matches();
 
