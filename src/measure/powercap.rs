@@ -1,7 +1,7 @@
 use std::{
     fs::read_to_string,
     path::{Path, PathBuf},
-    time::{Duration, SystemTime},
+    time::SystemTime,
 };
 
 #[derive(Debug, Default)]
@@ -32,7 +32,7 @@ impl PowerCap {
     }
 }
 
-pub fn powercap_init() -> PowerCap {
+pub fn init() -> PowerCap {
     let mut powercap = PowerCap::new();
     let tmp = Path::new("/sys/class/powercap");
     let mut powercap_dir = tmp.read_dir().expect("Failed to open powercap directory");
@@ -77,19 +77,13 @@ pub fn powercap_init() -> PowerCap {
     powercap
 }
 
-pub fn powercap_print(powercap: &mut PowerCap) {
+pub fn print(powercap: &mut PowerCap) {
     if powercap.len() == 0 {
         return;
     }
     let curtime = SystemTime::now();
     let extime = powercap.1;
     let diftime = curtime.duration_since(extime).unwrap_or_default();
-    // let diftime = match powercap.1 {
-    //     Some(extime) => curtime
-    //         .duration_since(extime)
-    //         .unwrap_or(Duration::from_secs(0)),
-    //     None => Duration::from_secs(0),
-    // };
     for i in &mut powercap.0 {
         // let tmp = read_to_string(&i.path).unwrap_or_default();
         let tmp = match read_to_string(&i.path) {
@@ -100,11 +94,11 @@ pub fn powercap_print(powercap: &mut PowerCap) {
         let tmp = &tmp[0..tmp.len() - 1];
         // tmp.pop();
         let cur = tmp.parse().unwrap_or_default();
-        if !(cur == 0 || diftime.as_secs() == 0) {
+        if !(cur == 0 || diftime.as_millis() == 0) {
             println!(
                 "{:<13}{:>6}mW\x1b[K",
                 i.name,
-                (cur - i.last) / (diftime.as_secs() * 1000)
+                (cur - i.last) / (diftime.as_millis() as u64)
             );
         }
         i.last = cur;
