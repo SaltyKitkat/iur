@@ -59,7 +59,6 @@ pub fn init() -> PowerCap {
                 };
                 let mut path = dir.path();
                 path.push("energy_uj");
-                let path = path;
                 powercap.0.push(PowerSensor::new(name, path));
             }
             _ => (),
