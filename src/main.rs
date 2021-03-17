@@ -1,5 +1,4 @@
 mod measure;
-
 use clap::*;
 
 enum AppMode<'a> {
@@ -22,12 +21,20 @@ impl Config {
 
 fn main() {
     let app_m = App::new("intel-undervolt-rs")
+        .bin_name("iur")
         .subcommands(vec![
             SubCommand::with_name("read"),
-            SubCommand::with_name("apply").args(&[Arg::with_name("dry-run")
-                .long("dry-run")
-                .short("n")
-                .help("perform a trial run with no changes made")]),
+            SubCommand::with_name("apply").args(&[
+                Arg::with_name("dry-run")
+                    .long("dry-run")
+                    .short("n")
+                    .help("perform a trial run with no changes made"),
+                Arg::with_name("with-config")
+                    .long("with-config")
+                    .short("c")
+                    .takes_value(true)
+                    .default_value("/etc/iur/iur.conf"),
+            ]),
             SubCommand::with_name("measure").args(&[Arg::with_name("delay-time")
                 .long("delay-time")
                 .short("d")

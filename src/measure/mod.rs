@@ -26,4 +26,3 @@ pub fn sub_run(args: &ArgMatches) -> ! {
         sleep(Duration::from_secs_f64(delay_time));
     }
 }
-

@@ -72,7 +72,6 @@ pub fn init() -> PowerCap {
         let tmp = &tmp[0..tmp.len() - 1];
         i.last = tmp.parse().unwrap_or_default();
     }
-
     powercap
 }
 
@@ -89,9 +88,7 @@ pub fn print(powercap: &mut PowerCap) {
             Ok(s) => s,
             Err(_) => continue,
         };
-
-        let tmp = &tmp[0..tmp.len() - 1];
-        // tmp.pop();
+        let tmp = &tmp[0..tmp.len() - 1]; // remove the ending '\n'
         let cur = tmp.parse().unwrap_or_default();
         if !(cur == 0 || diftime.as_millis() == 0) {
             println!(
