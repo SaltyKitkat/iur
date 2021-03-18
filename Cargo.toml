@@ -9,12 +9,6 @@ edition = "2018"
 name = "iur"
 path = "src/lib.rs"
 
-[[bin]]
-name = "iur"
-path = "src/bin/iur.rs"
-
-
-
 [profile.release]
 codegen-units = 1
 lto = true

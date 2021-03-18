@@ -1,3 +1,5 @@
+use std::{path::Path, process::exit};
+
 use clap::{App, Arg, ArgMatches, SubCommand};
 use iur::{modes::*, Config};
 
@@ -6,13 +8,30 @@ enum IurMode<'a> {
     Apply(&'a ArgMatches<'a>),
     Measure(&'a ArgMatches<'a>),
 }
+use IurMode::*;
 
-fn app_run(mode: IurMode) {
-    if let IurMode::Measure(args) = mode {
-        measure::sub_run(args);
+fn app_run(mode: IurMode) -> ! {
+    match mode {
+        Measure(args) => measure::sub_run(args),
+        Apply(args) => {
+            //it has default_value("/etc/iur/iur.conf") so it should be safe to unwrap here.
+            let config_path = Path::new(args.value_of("with-config").unwrap());
+            match Config::from_file(config_path) {
+                Some(conf) => {
+                    if args.occurrences_of("dry-run") != 0{
+                        println!("{}", conf);
+                        exit(0);
+                    }
+                    rw::apply(conf);
+                }
+                None => panic!(
+                    "Failed to load config file from {}",
+                    config_path.as_os_str().to_string_lossy()
+                ),
+            };
+        }
+        Read => rw::read(),
     }
-    let config = Config::from_file().expect("Failed to setup program");
-    todo!()
 }
 fn main() {
     let app_m = App::new("intel-undervolt-rs")
@@ -39,9 +58,9 @@ fn main() {
         .get_matches();
 
     match app_m.subcommand() {
-        ("read", Some(_)) => app_run(IurMode::Read),
-        ("apply", Some(sub_m)) => app_run(IurMode::Apply(sub_m)),
-        ("measure", Some(sub_m)) => app_run(IurMode::Measure(sub_m)),
+        ("read", Some(_)) => app_run(Read),
+        ("apply", Some(sub_m)) => app_run(Apply(sub_m)),
+        ("measure", Some(sub_m)) => app_run(Measure(sub_m)),
         _ => println!("{}", app_m.usage()),
     }
 }
