@@ -1,8 +1,8 @@
 use std::{thread::sleep, time::Duration};
 
 use clap::ArgMatches;
-mod powercap;
 mod coretemp;
+mod powercap;
 
 pub fn sub_run(args: &ArgMatches) -> ! {
     println!("measure mode");

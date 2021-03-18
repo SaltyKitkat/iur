@@ -1,26 +1,17 @@
 use clap::{App, Arg, ArgMatches, SubCommand};
-use iur::measure;
-pub struct Config {
-    undervolts: [i32; 5],
-    powerlimit: [i32; 2],
-    tjoffset: Option<i32>,
-}
-impl Config {
-    fn from_file() -> Option<Config> {
-        todo!()
-    }
-}
+use iur::{modes::*, Config};
 
 enum IurMode<'a> {
     Read,
     Apply(&'a ArgMatches<'a>),
     Measure(&'a ArgMatches<'a>),
 }
+
 fn app_run(mode: IurMode) {
     if let IurMode::Measure(args) = mode {
         measure::sub_run(args);
     }
-    let config = Config::from_file().expect("Failed to setup program, quiting ...");
+    let config = Config::from_file().expect("Failed to setup program");
     todo!()
 }
 fn main() {
