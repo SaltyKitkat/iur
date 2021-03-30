@@ -31,10 +31,7 @@ impl PowerCap {
     pub fn new() -> PowerCap {
         let mut powercap = PowerCap(vec![], SystemTime::now());
         let tmp = Path::new("/sys/class/powercap");
-        let mut powercap_dir = tmp.read_dir().expect("Failed to open powercap directory");
-        if powercap_dir.all(|d| d.is_err()) {
-            panic!("Failed to open powercap directory");
-        }
+        let powercap_dir = tmp.read_dir().expect("Failed to open powercap directory");
         for entry in powercap_dir {
             match entry {
                 Ok(dir)
