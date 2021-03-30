@@ -5,7 +5,7 @@ use libmedium::{
     units::Temperature,
 };
 
-pub fn init() -> Hwmon {
+pub(crate) fn init() -> Hwmon {
     let tmp = parse_hwmons().expect("Failed to read from hwmon!");
     let x = tmp
         .hwmons_by_name("coretemp")
@@ -18,7 +18,7 @@ pub fn init() -> Hwmon {
 pub fn print(hwmon: &Hwmon) {
     for (_id, temp_sensor) in hwmon.temps() {
         println!(
-            "{:<13}{:>6}°C\x1b[K",
+            "{:<12}{:>6}°C\x1b[K",
             temp_sensor.name(),
             temp_sensor
                 .read_input()

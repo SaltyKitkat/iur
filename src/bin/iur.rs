@@ -14,11 +14,17 @@ fn app_run(mode: IurMode) -> ! {
     match mode {
         Measure(args) => measure::sub_run(args),
         Apply(args) => {
-            //it has default_value("/etc/iur/iur.conf") so it should be safe to unwrap here.
-            let config_path = Path::new(args.value_of("with-config").unwrap());
+            // it has default_value("/etc/iur/iur.conf") so it should be safe to unwrap here.
+            let config_path = Path::new(match args.value_of("with-config") {
+                Some(v) => v,
+                None => {
+                    // panic!("config file default option failed!!!\n");
+                    unreachable!()
+                }
+            });
             match Config::from_file(config_path) {
                 Some(conf) => {
-                    if args.occurrences_of("dry-run") != 0{
+                    if args.occurrences_of("dry-run") != 0 {
                         println!("{}", conf);
                         exit(0);
                     }

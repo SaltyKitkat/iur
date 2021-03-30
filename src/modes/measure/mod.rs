@@ -2,6 +2,7 @@ use std::{thread::sleep, time::Duration};
 
 use clap::ArgMatches;
 mod coretemp;
+mod cpufreq;
 mod powercap;
 use powercap::PowerCap;
 
@@ -22,6 +23,8 @@ pub fn sub_run(args: &ArgMatches) -> ! {
         powercap::print(&mut powercap);
         println!("\x1b[K");
         coretemp::print(&hwmon);
+        println!("\x1b[K");
+        cpufreq::test();
         // println!("{}", delay_time);
         print!("\x1b[J\x1b[H");
         sleep(Duration::from_secs_f64(delay_time));

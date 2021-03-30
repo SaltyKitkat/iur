@@ -21,14 +21,14 @@ impl PowerSensor {
     }
 }
 #[derive(Debug)]
-pub struct PowerCap(Vec<PowerSensor>, SystemTime);
+pub(crate) struct PowerCap(Vec<PowerSensor>, SystemTime);
 
 impl PowerCap {
-    pub fn len(&self) -> usize {
+    pub(crate) fn len(&self) -> usize {
         self.0.len()
     }
 
-    pub fn new() -> PowerCap {
+    pub(crate) fn new() -> PowerCap {
         let mut powercap = PowerCap(vec![], SystemTime::now());
         let tmp = Path::new("/sys/class/powercap");
         let powercap_dir = tmp.read_dir().expect("Failed to open powercap directory");
@@ -69,7 +69,7 @@ impl PowerCap {
     }
 }
 
-pub fn print(powercap: &mut PowerCap) {
+pub(crate) fn print(powercap: &mut PowerCap) {
     if powercap.len() == 0 {
         return;
     }
@@ -86,9 +86,9 @@ pub fn print(powercap: &mut PowerCap) {
         let cur = tmp.parse().unwrap_or_default();
         if !(cur == 0 || diftime.as_millis() == 0) {
             println!(
-                "{:<13}{:>6}mW\x1b[K",
+                "{:<13}{:>6.3}W\x1b[K",
                 i.name,
-                (cur - i.last) / (diftime.as_millis() as u64)
+                ((cur - i.last) / diftime.as_millis() as u64) as f64 / 1000.0
             );
         }
         i.last = cur;
