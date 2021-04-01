@@ -42,15 +42,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "cpu-freq"
-version = "0.0.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "39ceca04fadb699a10e243450cd3e74149cf79cd5c4f5dca4698f9381cf039c6"
-dependencies = [
- "num_cpus",
-]
-
-[[package]]
 name = "hermit-abi"
 version = "0.1.18"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -64,7 +55,6 @@ name = "iur"
 version = "0.0.1"
 dependencies = [
  "clap",
- "cpu-freq",
  "libmedium",
 ]
 
@@ -79,16 +69,6 @@ name = "libmedium"
 version = "0.5.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "27f6a8f301ebe547c6a400419521eda51c650687b5877540de8dadbf491921c1"
-
-[[package]]
-name = "num_cpus"
-version = "1.13.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "05499f3756671c15885fee9034446956fff3f243d6077b91e5767df161f766b3"
-dependencies = [
- "hermit-abi",
- "libc",
-]
 
 [[package]]
 name = "strsim"

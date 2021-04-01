@@ -77,7 +77,6 @@ pub(crate) fn print(powercap: &mut PowerCap) {
     let extime = powercap.1;
     let diftime = curtime.duration_since(extime).unwrap_or_default();
     for i in &mut powercap.0 {
-        // let tmp = read_to_string(&i.path).unwrap_or_default();
         let tmp = match read_to_string(&i.path) {
             Ok(s) => s,
             Err(_) => continue,
