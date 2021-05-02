@@ -15,5 +15,5 @@ codegen-units = 1
 
 [dependencies]
 clap = "2.33"
-cpu-freq = "0.0"
-libmedium = "0.5"
+libmedium = "*"
+num_cpus="*"

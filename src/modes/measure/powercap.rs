@@ -1,5 +1,6 @@
 use std::{
-    fs::read_to_string,
+    fs::{read_to_string, File},
+    io::{Read, Seek, SeekFrom},
     path::{Path, PathBuf},
     time::SystemTime,
 };
@@ -7,7 +8,7 @@ use std::{
 #[derive(Debug, Default)]
 struct PowerSensor {
     name: String,
-    path: PathBuf,
+    fd: Option<File>,
     last: u64,
 }
 
@@ -15,7 +16,7 @@ impl PowerSensor {
     fn new(name: String, path: PathBuf) -> Self {
         Self {
             name,
-            path,
+            fd: File::open(path).ok(),
             last: 0,
         }
     }
@@ -58,9 +59,15 @@ impl PowerCap {
             }
         }
         for i in &mut powercap.0 {
-            let tmp = match read_to_string(&i.path) {
-                Ok(s) => s,
-                Err(_) => continue,
+            let tmp: String = match &mut i.fd {
+                Some(fd) => {
+                    let mut buf = String::new();
+                    match fd.read_to_string(&mut buf) {
+                        Ok(_) => buf,
+                        Err(_) => continue,
+                    }
+                }
+                None => continue,
             };
             let tmp = &tmp[0..tmp.len() - 1];
             i.last = tmp.parse().unwrap_or_default();
@@ -77,9 +84,16 @@ pub(crate) fn print(powercap: &mut PowerCap) {
     let extime = powercap.1;
     let diftime = curtime.duration_since(extime).unwrap_or_default();
     for i in &mut powercap.0 {
-        let tmp = match read_to_string(&i.path) {
-            Ok(s) => s,
-            Err(_) => continue,
+        let tmp: String = match &mut i.fd {
+            Some(fd) => {
+                fd.seek(SeekFrom::Start(0)).unwrap();
+                let mut buf = String::new();
+                match fd.read_to_string(&mut buf) {
+                    Ok(_) => buf,
+                    Err(_) => continue,
+                }
+            }
+            None => continue,
         };
         let tmp = &tmp[0..tmp.len() - 1]; // remove the ending '\n'
         let cur = tmp.parse().unwrap_or_default();
