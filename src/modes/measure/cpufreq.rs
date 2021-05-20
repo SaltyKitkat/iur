@@ -1,19 +1,4 @@
-// use cpu_freq;
-
 pub(crate) fn test(freq: &mut CpuFreqs) {
-    // let tmp = cpu_freq::get();
-    // tmp.iter()
-    //     .enumerate()
-    //     .for_each(|(i, cpu_freq::CpuFreqs { cur, .. })| {
-    //         println!(
-    //             "Core {:<4}{:>8.3}MHz",
-    //             i,
-    //             match cur {
-    //                 Some(v) => v,
-    //                 None => unreachable!(),
-    //             }
-    //         );
-    //     });
     freq.read();
     freq.fds
         .iter()
