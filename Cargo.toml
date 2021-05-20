@@ -1,0 +1,19 @@
+[package]
+name = "iur"
+version = "0.0.1"
+authors = ["SaltyKitkat <954537646@qq.com>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[[bin]]
+name = "iur"
+path = "src/bin/iur.rs"
+
+[profile.release]
+codegen-units = 1
+
+[dependencies]
+clap = "2.33"
+libmedium = "*"
+num_cpus="*"
