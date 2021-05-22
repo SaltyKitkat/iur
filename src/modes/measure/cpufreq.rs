@@ -1,73 +1,63 @@
-pub(crate) fn test(freq: &mut CpuFreqs) {
-    freq.read();
-    freq.fds
-        .iter()
-        .enumerate()
-        .for_each(|(i, freq)| println!("Core {:<4}{:>8.3}MHz", i, freq.0))
-}
-
-use num_cpus;
 use std::{
-    fs::File,
-    io::{Read, Seek, SeekFrom},
+    error::Error,
+    fs,
     path::{Path, PathBuf},
 };
-pub struct CpuFreqs {
-    fds: Vec<(u32, Option<File>)>,
+
+#[derive(Debug)]
+pub(crate) struct CpuFreq {
+    freq: Vec<u32>,
+    paths: Vec<PathBuf>,
 }
-impl CpuFreqs {
-    pub fn init() -> CpuFreqs {
-        let cpu_num = num_cpus::get();
-        let paths = if Path::new("/sys/devices/system/cpu/cpufreq/policy0").exists() {
-            let mut tmp = vec![];
-            (0..cpu_num).for_each(|id| {
-                tmp.push(PathBuf::from(format!(
-                    "/sys/devices/system/cpu/cpufreq/policy{}/scaling_cur_freq",
-                    id
-                )))
-            });
-            tmp
-        } else if Path::new("/sys/devices/system/cpu/cpu0/cpufreq").exists() {
-            let mut tmp = vec![];
-            (0..cpu_num).for_each(|id| {
-                tmp.push(PathBuf::from(format!(
-                    "/sys/devices/system/cpu/cpu{}/cpufreq/scaling_cur_freq",
-                    id
-                )))
-            });
-            tmp
-        } else {
-            todo!("support other ways")
-        };
-        let fds = paths
-            .into_iter()
-            .map(|path| (0, File::open(path).ok()))
-            .collect();
-        CpuFreqs { fds }
+
+impl CpuFreq {
+    pub fn new() -> Result<CpuFreq, Box<dyn Error>> {
+        fn sel_path() -> String {
+            if Path::new("/sys/devices/system/cpu/cpufreq/policy0").exists() {
+                "/sys/devices/system/cpu/cpufreq/policy{}/scaling_cur_freq".to_string()
+            } else if Path::new("/sys/devices/system/cpu/cpu0/cpufreq").exists() {
+                "/sys/devices/system/cpu/cpu{}/cpufreq/scaling_cur_freq".to_string()
+            } else {
+                todo!("not supported yet!")
+            }
+        }
+
+        let pathstr = sel_path();
+        let num_cpus = num_cpus::get();
+        let mut freq = Vec::with_capacity(num_cpus);
+        let mut paths = Vec::with_capacity(num_cpus);
+        for i in 0..num_cpus {
+            let p = PathBuf::from(pathstr.clone().replace("{}", &i.to_string()));
+            freq.push(
+                fs::read_to_string(&p)?
+                    .split('\n')
+                    .next()
+                    .unwrap()
+                    .parse()?,
+            );
+            paths.push(p);
+        }
+        Ok(CpuFreq { freq, paths })
     }
 
-    fn read_to_vec(&mut self, ret: &mut Vec<u32>) {
-        self.fds.iter_mut().for_each(|fd| {
-            if let (_, Some(fd)) = fd {
-                let mut buf = String::with_capacity(16);
-                fd.read_to_string(&mut buf).unwrap();
-                let buf = &buf[0..buf.len() - 1];
-                let raw_freq: u32 = buf.parse().unwrap();
-                ret.push(raw_freq / 1000);
-            }
-        });
+    pub fn print(&mut self) {
+        let freq_data = self.get();
+        for (i, f) in freq_data.iter().enumerate() {
+            println!("Cpu{:<12}{:>6}MHz\x1b[K", i, f / 1000);
+        }
     }
 
-    pub fn read(&mut self) {
-        self.fds.iter_mut().for_each(|fd| {
-            if let (freq, Some(fd)) = fd {
-                let mut buf = String::with_capacity(16);
-                fd.seek(SeekFrom::Start(0)).unwrap();
-                fd.read_to_string(&mut buf).unwrap();
-                let buf = &buf[0..buf.len() - 1];
-                let raw_freq: u32 = buf.parse().unwrap();
-                *freq = raw_freq / 1000;
-            }
-        });
+    pub fn get(&mut self) -> &[u32] {
+        let CpuFreq { freq, paths } = self;
+        for (f, p) in freq.into_iter().zip(paths) {
+            *f = fs::read_to_string(p)
+                .unwrap()
+                .split('\n')
+                .next()
+                .unwrap()
+                .parse()
+                .unwrap();
+        }
+        &*freq
     }
 }

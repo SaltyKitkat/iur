@@ -4,6 +4,7 @@ use clap::ArgMatches;
 mod coretemp;
 mod cpufreq;
 mod powercap;
+use cpufreq::CpuFreq;
 use powercap::PowerCap;
 
 pub fn sub_run(args: &ArgMatches) -> ! {
@@ -16,7 +17,7 @@ pub fn sub_run(args: &ArgMatches) -> ! {
 
     let hwmon = coretemp::init();
     let mut powercap = PowerCap::new();
-    let mut freq = cpufreq::CpuFreqs::init();
+    let mut freq = CpuFreq::new().expect("read cpufreq error");
     sleep(Duration::from_millis(5)); // prevent powercap from div 0 at the first calculate, may lead to inaccurate result in the first show
 
     print!("\x1b[H\x1b[J");
@@ -25,7 +26,7 @@ pub fn sub_run(args: &ArgMatches) -> ! {
         println!("\x1b[K");
         coretemp::print(&hwmon);
         println!("\x1b[K");
-        cpufreq::test(&mut freq);
+        CpuFreq::print(&mut freq);
         print!("\x1b[J\x1b[H");
         sleep(Duration::from_secs_f64(delay_time));
     }
