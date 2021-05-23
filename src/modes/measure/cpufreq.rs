@@ -14,9 +14,9 @@ impl CpuFreq {
     pub fn new() -> Result<CpuFreq, Box<dyn Error>> {
         fn sel_path() -> String {
             if Path::new("/sys/devices/system/cpu/cpufreq/policy0").exists() {
-                "/sys/devices/system/cpu/cpufreq/policy{}/scaling_cur_freq".to_string()
+                String::from("/sys/devices/system/cpu/cpufreq/policy{}/scaling_cur_freq")
             } else if Path::new("/sys/devices/system/cpu/cpu0/cpufreq").exists() {
-                "/sys/devices/system/cpu/cpu{}/cpufreq/scaling_cur_freq".to_string()
+                String::from("/sys/devices/system/cpu/cpu{}/cpufreq/scaling_cur_freq")
             } else {
                 todo!("not supported yet!") // maybe we can throw an error here instead
             }
