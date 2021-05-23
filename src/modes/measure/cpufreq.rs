@@ -18,7 +18,7 @@ impl CpuFreq {
             } else if Path::new("/sys/devices/system/cpu/cpu0/cpufreq").exists() {
                 "/sys/devices/system/cpu/cpu{}/cpufreq/scaling_cur_freq".to_string()
             } else {
-                todo!("not supported yet!")
+                todo!("not supported yet!") // maybe we can throw an error here instead
             }
         }
 
@@ -28,6 +28,10 @@ impl CpuFreq {
         let mut paths = Vec::with_capacity(num_cpus);
         for i in 0..num_cpus {
             let p = PathBuf::from(pathstr.clone().replace("{}", &i.to_string()));
+            // unnecessary to read the value here.
+            // but read it once on create to make sure
+            // we both have permission and can parse it correctly
+            // so it won't get an error when calling get().( in normal situation
             freq.push(
                 fs::read_to_string(&p)?
                     .split('\n')
@@ -40,6 +44,7 @@ impl CpuFreq {
         Ok(CpuFreq { freq, paths })
     }
 
+    // if get() returns a Result<>, we should deal with it in print()
     pub fn print(&mut self) {
         let freq_data = self.get();
         for (i, f) in freq_data.iter().enumerate() {
@@ -47,7 +52,9 @@ impl CpuFreq {
         }
     }
 
+    // maybe we should return Result<> instead?
     pub fn get(&mut self) -> &[u32] {
+        // this is how we can mut borrow multi fields of a struct at the same time
         let CpuFreq { freq, paths } = self;
         for (f, p) in freq.into_iter().zip(paths) {
             *f = fs::read_to_string(p)
