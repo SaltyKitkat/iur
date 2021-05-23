@@ -12,8 +12,9 @@ path = "src/bin/iur.rs"
 
 [profile.release]
 codegen-units = 1
+lto = true
 
 [dependencies]
-clap = "2.33"
+clap = { version = "2.33", default-features = false, features = ["vec_map"]}
 libmedium = "*"
 num_cpus="*"

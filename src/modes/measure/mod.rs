@@ -26,7 +26,7 @@ pub fn sub_run(args: &ArgMatches) -> ! {
         println!("\x1b[K");
         coretemp::print(&hwmon);
         println!("\x1b[K");
-        CpuFreq::print(&mut freq);
+        freq.print();
         print!("\x1b[J\x1b[H");
         sleep(Duration::from_secs_f64(delay_time));
     }

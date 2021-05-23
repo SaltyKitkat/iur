@@ -32,7 +32,7 @@ impl CpuFreq {
                 fs::read_to_string(&p)?
                     .split('\n')
                     .next()
-                    .unwrap()
+                    .unwrap()// read the first line of file
                     .parse()?,
             );
             paths.push(p);
