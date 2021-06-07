@@ -4,7 +4,6 @@ use std::{
     path::{Path, PathBuf},
 };
 
-#[derive(Debug)]
 pub(crate) struct CpuFreq {
     freq: Vec<u32>,
     paths: Vec<PathBuf>,
@@ -48,7 +47,7 @@ impl CpuFreq {
     pub fn print(&mut self) {
         let freq_data = self.get();
         for (i, f) in freq_data.iter().enumerate() {
-            println!("Cpu{:<12}{:>6}MHz\x1b[K", i, f / 1000);
+            println!("Cpu{:<8}{:>6}MHz\x1b[K", i, f / 1000);
         }
     }
 
@@ -68,3 +67,4 @@ impl CpuFreq {
         &*freq
     }
 }
+
